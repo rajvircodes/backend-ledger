@@ -38,7 +38,6 @@ async function userRegisterController(req, res) {
         _id:user._id,
         name:user.name,
         email:user.email,
-
     },
     token
   });
@@ -51,7 +50,7 @@ async function userRegisterController(req, res) {
  * - User login controller
  * - POST /api/auth/login
  */
-async function userLoginController(req, res)  {
+async function userLoginController(req, res) {
   const {email, password} = req.body;
 
   const user = await User.findOne({email}).select("+password")
