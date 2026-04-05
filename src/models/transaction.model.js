@@ -15,7 +15,7 @@ transactionSchema = new mongoose.Schema({
     },
     status: {
       type: String,
-      enum: ["PENDING", "SUCCESS", "FAILED"],
+      enum: ["PENDING", "SUCCESS", "FAILED","REVERSED"],
       default: "PENDING",
     },
     amount: {
