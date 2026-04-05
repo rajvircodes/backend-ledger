@@ -38,7 +38,10 @@ userSchema.pre("save", async function (next) {
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-  } catch (err) {}
+  } catch (err) {
+    console.log("err",err.message);
+    
+  }
 });
 
 // Instance method to check password
