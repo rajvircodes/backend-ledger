@@ -1,61 +1,57 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose")
+const bcrypt = require("bcryptjs")
 
-const userSchema = new mongoose.Schema(
-  {
+
+const userSchema = new mongoose.Schema({
     email: {
-      type: String,
-      required: [true, "Email is required"],
-      unique: true,
-      trim: true,
-      lowercase: true,
-      match: [
-        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-        "Invalid email address",
-      ],
+        type: String,
+        required: [ true, "Email is required for creating a user" ],
+        trim: true,
+        lowercase: true,
+        match: [ /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Invalid Email address" ],
+        unique: [ true, "Email already exists." ]
     },
     name: {
-      type: String,
-      required: [true, "Name is required"],
+        type: String,
+        required: [ true, "Name is required for creating an account" ]
     },
     password: {
-      type: String,
-      required: [true, "Password is required"],
-      minlength: [6, "Password should be at least 6 characters"],
-      select: false,
+        type: String,
+        required: [ true, "Password is required for creating an account" ],
+        minlength: [ 6, "password should contain more than 6 character" ],
+        select: false
     },
-    systemUser:{
-      type:Boolean,
-      default:false,
-      immutable:true,
-      select:false,
-
-
+    systemUser: {
+        type: Boolean,
+        default: false,
+        immutable: true,
+        select: false
     }
-  },
-  {
-    timestamps: true,
-  },
-);
+}, {
+    timestamps: true
+})
 
-// Middleware to hash password before saving
-userSchema.pre("save", async function (next) {
-  // Only hash if the password has been modified (or is new)
-  if (!this.isModified("password")) return;
+userSchema.pre("save", async function () {
+    if (!this.isModified("password")) {
+        return
+    }
 
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-  } catch (err) {
-    console.log("err", err.message);
-  }
-});
+    const hash = await bcrypt.hash(this.password, 10)
+    this.password = hash
 
-// Instance method to check password
+    return
+
+})
+
 userSchema.methods.comparePassword = async function (password) {
-  return await bcrypt.compare(password, this.password);
-};
 
-const User = mongoose.model("User", userSchema);
+    console.log(password, this.password)
 
-module.exports = User;
+    return await bcrypt.compare(password, this.password)
+
+}
+
+
+const userModel = mongoose.model("user", userSchema)
+
+module.exports = userModel
