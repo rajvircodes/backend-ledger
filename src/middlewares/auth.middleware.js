@@ -19,8 +19,40 @@ const authMiddleware = async (req, res, next) => {
 
     return next();
   } catch (error) {
-    return res.status(401).json({ message: "Unauthorized access, token is invalid" });
+    return res
+      .status(401)
+      .json({ message: "Unauthorized access, token is invalid" });
   }
 };
 
-module.exports = {authMiddleware}
+const authSystemUserMiddleware = async (req, res, next) => {
+  const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({
+      message: "Unauthorized access, token missing",
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId).select("+systemUser");
+    if (!user || !user.systemUser) {
+      return res.status(403).json({
+        message: "Forbidden access, user is not a system user",
+      });
+    }
+
+    req.user = user;
+
+    return next();
+
+    
+  } catch (error) {
+    return res
+      .status(401)
+      .json({ message: "Unauthorized access, token is invalid" });
+  }
+};
+
+module.exports = { authMiddleware, authSystemUserMiddleware };

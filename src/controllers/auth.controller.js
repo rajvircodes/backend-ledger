@@ -1,6 +1,6 @@
 const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
-const  emailService  = require("../services/email.services");
+const emailService = require("../services/email.services");
 
 /**
  * - user register controller
@@ -16,7 +16,7 @@ async function userRegisterController(req, res) {
   if (isExists) {
     return res.status(422).json({
       message: "User already exists with email",
-      status: failed,
+      status: false,
     });
   }
 
@@ -34,44 +34,43 @@ async function userRegisterController(req, res) {
 
   res.status(201).json({
     message: "User register successfully!",
-    user:{
-        _id:user._id,
-        name:user.name,
-        email:user.email,
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
     },
-    token
+    token,
   });
 
   await emailService.sendRegistrationEmail(user.email, user.name);
 }
-
 
 /**
  * - User login controller
  * - POST /api/auth/login
  */
 async function userLoginController(req, res) {
-  const {email, password} = req.body;
+  const { email, password } = req.body;
 
-  const user = await User.findOne({email}).select("+password")
+  const user = await User.findOne({ email }).select("+password");
 
-  if(!user){
+  if (!user) {
     return res.status(401).json({
-      message:"Email or password invalid",
-      success:false
-    })
+      message: "Email or password invalid",
+      success: false,
+    });
   }
 
-  const isValidPassword = await user.comparePassword(password)
-  
-  if(!isValidPassword){
+  const isValidPassword = await user.comparePassword(password);
+
+  if (!isValidPassword) {
     return res.status(401).json({
-        message:"Email or password invalid",
-        success:false
-      })
+      message: "Email or password invalid",
+      success: false,
+    });
   }
 
-const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
     expiresIn: "3d",
   });
 
@@ -79,18 +78,16 @@ const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
 
   res.status(200).json({
     message: "User login successfully!",
-    user:{
-        _id:user._id,
-        name:user.name,
-        email:user.email,
-
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
     },
-    token
+    token,
   });
-
 }
 
 module.exports = {
   userRegisterController,
-  userLoginController
+  userLoginController,
 };
