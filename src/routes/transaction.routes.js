@@ -15,6 +15,10 @@ transactionRoutes.post(
  * - Create initial funds function
  */
 
-transactionRoutes.post('/system/initial-funds', authMiddleware.authSystemUserMiddleware, transactionController.createInitialFundsTransaction);
+transactionRoutes.post(
+  "/system/initial-funds",
+  authMiddleware.authSystemUserMiddleware,
+  transactionController.createInitialFundsTransaction,
+);
 
 module.exports = transactionRoutes;

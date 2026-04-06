@@ -31,6 +31,7 @@ async function createTransaction(req, res) {
             message: "FromAccount, toAccount, amount and idempotencyKey are required"
         })
     }
+    
 
     const fromUserAccount = await Account.findOne({
         _id: fromAccount,
